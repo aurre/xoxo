@@ -23,10 +23,14 @@ const getInput = player => async () => {
       message: `${turn}'s move (row,col):`,
     },
   ]);
-  console.log(ans);
   const [row = 0, col = 0] = ans.coord.split(/[,\s+]/).map(x => +x);
-  game.dispatch(move(turn, [row, col]));
-  // game.dispatch()
+  game.dispatch(move(turn, [row, col]))
+  const {winner} = game.getState()
+  if (typeof winner === 'string') { 
+    if (winner === 'draw') { console.log('It\'s a draw!')}
+    else { console.log(winner, ' wins!') }
+    process.exit(0);
+  }
 };
 
 // Create the store

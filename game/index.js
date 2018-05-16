@@ -4,6 +4,7 @@ import { Map } from 'immutable';
 const initialState = {
   board: Map(),
   turn: 'X',
+  winner: null
 };
 
 export const move = (turn, [row, col]) => ({
@@ -14,30 +15,34 @@ export const move = (turn, [row, col]) => ({
 });
 
 const winner = board => {
-  console.log(board);
+
   for (let x = 0; x < 3; x++) {
-    if ((board.get(x).get(0) === board.get(x).get(1)) === board.get(x).get(2)) {
-      return board.get(x).get(0);
+    if ((board.getIn([x, 0]) === board.getIn([x, 1])) && (board.getIn([x, 0]) === board.getIn([x, 2])) && (board.getIn([x, 0]) && board.getIn([x, 1]) && board.getIn([x, 2]))) {
+      return board.getIn([x, 0])
     }
   }
 
   for (let y = 0; y < 3; y++) {
-    if ((board.get(0).get(y) === board.get(1).get(y)) === board.get(2).get(y)) {
-      return board.get(0).get(y);
+    if ((board.getIn([0, y]) === board.getIn([1, y])) && (board.getIn([0, y]) === board.getIn([2, y])) && (board.getIn([0, y]) && board.getIn([1, y]) && board.getIn([2, y]))) {
+      return board.getIn([0, y])
     }
   }
 
-  if ((board.get(0).get(0) === board.get(1).get(1)) === board.get(2).get(2)) {
-    return board.get(0).get(0);
-  }
-  if ((board.get(2).get(0) === board.get(1).get(1)) === board.get(0).get(2)) {
-    return board.get(2).get(0);
+  if ((board.getIn([0, 0]) === board.getIn([1, 1])) && (board.getIn([0, 0]) === board.getIn([2, 2])) && (board.getIn([0, 0]) && board.getIn([1, 1]) && board.getIn([2, 2]))) {
+    return board.getIn([0, 0])
   }
 
-  if (board.keySeq().toArray().length === 9) {
-    return 'draw';
+  if ((board.getIn([0, 2]) === board.getIn([1, 1])) && (board.getIn([0, 2]) === board.getIn([2, 0])) && (board.getIn([2, 0]) && board.getIn([1, 1]) && board.getIn([0, 2]))) {
+    return board.getIn([0, 2])
   }
-  return null;
+
+  for (let x = 0; x < 3; x++) {
+    for (let y = 0; y < 3; y++) {
+      if (!board.getIn([x, y])) { return null; }
+    }
+  }
+
+  return 'draw';
 };
 
 function turnReducer(turn = 'X', action) {
@@ -51,16 +56,19 @@ function boardReducer(board = Map(), action) {
   return board;
 }
 
-export default function reducer(state = {}, action) {
+export default function reducer(state = initialState, action) {
   // TODO
-  switch (action.type) {
-    case 'MOVE':
-      console.log(action);
-      return {
-        board: boardReducer(state.board, action),
-        turn: turnReducer(state.turn, action),
-      };
-  }
+
+  const nextBoard = boardReducer(state.board, action);
+  const winnerOut = winner(nextBoard)
+  console.log(winnerOut)
+
+  return {
+    board: nextBoard,
+    turn: turnReducer(state.turn, action),
+    winner: winnerOut
+  };
+
 
   return state;
 }
