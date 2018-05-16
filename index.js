@@ -21,6 +21,7 @@ const getInput = player => async () => {
     name: 'coord',
     message: `${turn}'s move (row,col):`
   }])
+  console.log(ans)
   const [row=0, col=0] = ans.coord.split(/[,\s+]/).map(x => +x)
   game.dispatch(move(turn, [row, col]))
 }
